@@ -4,7 +4,12 @@ Django HTTP Proxy
 
 **Simple HTTP proxy service as a Django app.**
 
-**Author:** Mjumbe Wawatu Ukweli, [Follow me on Twitter][1].
+Main Module
+============
+
+Direct import: [proxy/views.py](proxy/views.py)     
+
+`from proxy.views import proxy_view`
 
 Installation
 ============
