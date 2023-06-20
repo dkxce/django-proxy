@@ -37,6 +37,7 @@ def proxy_view(request, url, requests_args=None, *args, **kwargs):
     for key, value in kwargs.items():
         if key.upper() == "HOST":
             headers["Host"] = value
+            headers["X-Forwarded-Host"] = value
         if key.upper() == "IP":
             headers["X-Real-IP"] = value
             headers["X-Forwarded-For"] = value
