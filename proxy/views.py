@@ -3,6 +3,7 @@ import requests
 import socket
 from django.http import HttpResponse
 from django.http import QueryDict
+from django.views.decorators.csrf import csrf_exempt
 try:
     from urlparse import urlparse
 except:
@@ -151,3 +152,21 @@ def get_headers(environ):
             headers[key.replace('_', '-')] = value
 
     return headers
+
+@csrf_exempt
+def proxy_nopath(request, *args, **kwargs):
+    """
+    No Pass Path
+    Usage: path("", proxy_nopath),        
+    Usage: re_path('(^(?!(admin|accounts|api)).*$)', proxy_nopath),
+    """
+    return proxy_view(request, 'http://localhost:8080/', None)
+
+@csrf_exempt
+def proxy_default(request, path, *args, **kwargs):
+    """    
+    Pass Path
+    Usage: re_path('^proxy(?P<path>/.*)$', proxy_default),
+    """
+    return proxy_view(request, f'http://localhost:8080{path}', None)
+    
