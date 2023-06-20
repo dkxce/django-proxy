@@ -166,6 +166,7 @@ def proxy_nopath(request, *args, **kwargs):
 def proxy_default(request, path, *args, **kwargs):
     """    
     Pass Path
+    Usage: re_path('^(?P<path>.*)$', default_proximizer),
     Usage: re_path('^proxy(?P<path>/.*)$', proxy_default),
     """
     return proxy_view(request, f'http://localhost:8080{path}', None)
