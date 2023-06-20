@@ -1,11 +1,15 @@
 import re
 import requests
+import socket
 from django.http import HttpResponse
 from django.http import QueryDict
 try:
     from urlparse import urlparse
 except:
     from urllib.parse import urlparse
+    
+version = '1.2.0-dkxce'
+module = 'django-proxy'
 
 def get_client_ip(request):
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
@@ -98,6 +102,12 @@ def proxy_view(request, url, requests_args=None, *args, **kwargs):
             proxy_response[key] = make_absolute_location(response.url, value)
         else:
             proxy_response[key] = value
+            
+    uri = urlparse(url)
+    try: HOSTNAME = socket.gethostname()
+    except: HOSTNAME = 'localhost'    
+    proxy_response["Via"] = f"{version} {module} {HOSTNAME}"
+    proxy_response["Forwarded"] = f"by={version},{module};for={remote_ip};host={HOSTNAME};proto={uri.scheme}"
 
     return proxy_response
 
