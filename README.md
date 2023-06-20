@@ -34,10 +34,24 @@ urlpatterns = patterns(
 )
 ```
 
+Or
+
+```python
+from django.urls import re_path 
+from proxy.views import proxy_view
+
+urlpatterns = [
+	...
+	re_path('^proxy(?P<path>/.*)$', proxy_view),
+	...
+]
+```
+
 Or from another view function:
 
 ```python
 from django.views.decorators.csrf import csrf_exempt
+from django.urls import re_path 
 from proxy.views import proxy_view
 
 @csrf_exempt
@@ -49,6 +63,7 @@ def myview(request, path):
 urlpatterns = patterns(
 	...
 	url('proxy/(?P<path>.*)', myview),
+	re_path('^defproxy(?P<path>/.*)$', proxy_view),
 	...
 )
 ```
