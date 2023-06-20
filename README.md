@@ -77,7 +77,7 @@ Changelog
 
 1.2.0-dkxce
 -----
-* Add Headers: X-Real-IP, X-Forwarded-For
+* Add Headers: X-Real-IP, X-Forwarded-For, Via, Forwarded
 
 1.2.0
 -----
