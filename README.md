@@ -1,6 +1,5 @@
 Django HTTP Proxy
 =================
-[![Tests Status](https://github.com/mjumbewu/django-proxy/actions/workflows/tests.yaml/badge.svg?branch=master&event=push)](https://github.com/mjumbewu/django-proxy/actions/workflows/tests.yaml)
 
 **Simple HTTP proxy service as a Django app.**
 
