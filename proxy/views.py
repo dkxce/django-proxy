@@ -7,8 +7,12 @@ try:
 except:
     from urllib.parse import urlparse
 
+def get_client_ip(request):
+    x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+    if x_forwarded_for: return x_forwarded_for.split(',')[0]
+    else: return request.META.get('REMOTE_ADDR')        
 
-def proxy_view(request, url, requests_args=None):
+def proxy_view(request, url, requests_args=None, *args, **kwargs):
     """
     Forward as close to an exact copy of the request as possible along to the
     given url.  Respond with as close to an exact copy of the resulting
@@ -16,10 +20,26 @@ def proxy_view(request, url, requests_args=None):
 
     If there are any additional arguments you wish to send to requests, put
     them in the requests_args dictionary.
+
+    kwargs: HOST=, IP=
     """
     requests_args = (requests_args or {}).copy()
     headers = get_headers(request.META)
     params = request.GET.copy()
+    remote_ip = get_client_ip(request)
+
+    # Remote IP Headers
+    headers["X-Real-IP"] = remote_ip
+    headers["X-Forwarded-For"] = remote_ip
+
+    # Custom Headers
+    #headers["Host"] = "..."
+    for key, value in kwargs.items():
+        if key.upper() == "HOST":
+            headers["Host"] = value
+        if key.upper() == "IP":
+            headers["X-Real-IP"] = value
+            headers["X-Forwarded-For"] = value
 
     if 'headers' not in requests_args:
         requests_args['headers'] = {}
