@@ -56,6 +56,10 @@ urlpatterns = patterns(
 Changelog
 =========
 
+1.2.0-dkxce
+-----
+* Add Headers: X-Real-IP, X-Forwarded-For
+
 1.2.0
 -----
 * Bug Fix: Missing imports
