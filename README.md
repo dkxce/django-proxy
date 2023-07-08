@@ -75,6 +75,10 @@ urlpatterns = patterns(
 Changelog
 =========
 
+1.2.1-dkxce
+-----
+* Add follow redirect (+ NOREDIRECT)
+
 1.2.0-dkxce
 -----
 * Add Headers: X-Real-IP, X-Forwarded-For, Via, Forwarded
