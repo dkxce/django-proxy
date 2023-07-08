@@ -11,6 +11,7 @@ except:
     
 version = '1.2.0-dkxce'
 module = 'django-proxy'
+allow_redirect = True
 
 def get_client_ip(request):
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
@@ -26,12 +27,13 @@ def proxy_view(request, url, requests_args=None, *args, **kwargs):
     If there are any additional arguments you wish to send to requests, put
     them in the requests_args dictionary.
 
-    kwargs: HOST=, IP=
+    kwargs: HOST=, IP=, NOREDIRECT=True
     """
     requests_args = (requests_args or {}).copy()
     headers = get_headers(request.META)
     params = request.GET.copy()
     remote_ip = get_client_ip(request)
+    follow_redirect = True
 
     # Remote IP Headers
     headers["X-Real-IP"] = remote_ip
@@ -46,6 +48,8 @@ def proxy_view(request, url, requests_args=None, *args, **kwargs):
         if key.upper() == "IP":
             headers["X-Real-IP"] = value
             headers["X-Forwarded-For"] = value
+        if key.upper() == "NOREDIRECT":
+            follow_redirect = value
 
     if 'headers' not in requests_args:
         requests_args['headers'] = {}
@@ -69,6 +73,9 @@ def proxy_view(request, url, requests_args=None, *args, **kwargs):
     requests_args['params'] = params
 
     response = requests.request(request.method, url, **requests_args)
+
+    if allow_redirect and follow_redirect and response.status_code in [301,302,303,304] and url != response.url:
+        response = requests.request(request.method, response.url, **requests_args)
 
     proxy_response = HttpResponse(
         response.content,
