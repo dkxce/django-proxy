@@ -9,7 +9,7 @@ try:
 except:
     from urllib.parse import urlparse
     
-version = '1.2.0-dkxce'
+version = '1.2.1-dkxce'
 module = 'django-proxy'
 allow_redirect = True
 
