@@ -49,7 +49,7 @@ def proxy_view(request, url, requests_args=None, *args, **kwargs):
             headers["X-Real-IP"] = value
             headers["X-Forwarded-For"] = value
         if key.upper() == "NOREDIRECT":
-            follow_redirect = value
+            follow_redirect = not value
 
     if 'headers' not in requests_args:
         requests_args['headers'] = {}
