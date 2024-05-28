@@ -75,6 +75,12 @@ urlpatterns = patterns(
 Changelog
 =========
 
+1.2.2-dkxce
+-----
+add custom kwargs to `proxy_view` function:
+- allow_request_content_headers: True|False
+- allow_response_content_headers: True|False
+
 1.2.1-dkxce
 -----
 * Add follow redirect (+ NOREDIRECT)
