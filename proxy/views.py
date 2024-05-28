@@ -9,11 +9,18 @@ try:
 except:
     from urllib.parse import urlparse
     
-version = '1.2.1-dkxce'
+version = '1.2.2-dkxce'
 module = 'django-proxy'
 allow_redirect = True
+allow_request_content_headers  = True
+allow_response_content_headers = True
 
 def get_client_ip(request):
+    try: # pip install django-ipware # https://github.com/un33k/django-ipware #
+        from ipware import get_client_ip as gip
+        ip, is_routable = gip(request)
+        if ip and is_routable: return ip
+    except: pass
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
     if x_forwarded_for: return x_forwarded_for.split(',')[0]
     else: return request.META.get('REMOTE_ADDR')        
@@ -27,7 +34,7 @@ def proxy_view(request, url, requests_args=None, *args, **kwargs):
     If there are any additional arguments you wish to send to requests, put
     them in the requests_args dictionary.
 
-    kwargs: HOST=, IP=, NOREDIRECT=True
+    kwargs: HOST=, IP=, NOREDIRECT=True, allow_request_content_headers=True|False, allow_response_content_headers=True|False
     """
     requests_args = (requests_args or {}).copy()
     headers = get_headers(request.META)
@@ -68,6 +75,16 @@ def proxy_view(request, url, requests_args=None, *args, **kwargs):
     for key in list(headers.keys()):
         if key.lower() == 'content-length':
             del headers[key]
+            
+    curr_allow_request_content_headers = allow_request_content_headers
+    if (allow := kwargs.get('allow_request_content_headers')) != None: curr_allow_request_content_headers = allow
+    curr_allow_response_content_headers = allow_response_content_headers
+    if (allow := kwargs.get('allow_response_content_headers')) != None: curr_allow_response_content_headers = allow
+
+    if not curr_allow_request_content_headers:
+        if headers.get('ACCEPT-ENCODING'): del headers['ACCEPT-ENCODING']
+        if headers.get('Accept-Encoding'): del headers['Accept-Encoding']
+        if headers.get('accept-encoding'): del headers['accept-encoding']
 
     requests_args['headers'] = headers
     requests_args['params'] = params
@@ -94,12 +111,12 @@ def proxy_view(request, url, requests_args=None, *args, **kwargs):
         # Although content-encoding is not listed among the hop-by-hop headers,
         # it can cause trouble as well.  Just let the server set the value as
         # it should be.
-        'content-encoding',
+        'zzzzzzzzz' if curr_allow_response_content_headers else 'content-encoding',
 
         # Since the remote server may or may not have sent the content in the
         # same encoding as Django will, let Django worry about what the length
         # should be.
-        'content-length',
+        'zzzzzzzzz' if curr_allow_response_content_headers else  'content-length',
     ])
     for key, value in response.headers.items():
         if key.lower() in excluded_headers:
@@ -177,4 +194,4 @@ def proxy_default(request, path, *args, **kwargs):
     Usage: re_path('^proxy(?P<path>/.*)$', proxy_default),
     """
     return proxy_view(request, f'http://localhost:8080{path}', None)
-    
+
